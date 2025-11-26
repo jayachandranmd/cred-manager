@@ -4,12 +4,16 @@ import { supabase } from '../supabaseClient';
 import SecondaryPasswordSetup from '../components/SecondaryPasswordSetup';
 import CredentialModal from '../components/CredentialModal';
 import SecurityPinModal from '../components/SecurityPinModal';
+import DocumentsView from '../components/DocumentsView';
 import { Plus, LogOut, Search, Key, Copy, Eye, EyeOff, Edit2, Trash2 } from 'lucide-react';
 
 export default function Dashboard() {
     const { signOut, user } = useAuth();
     const [loading, setLoading] = useState(true);
     const [hasSecondaryPassword, setHasSecondaryPassword] = useState(false);
+    const [activeTab, setActiveTab] = useState('credentials'); // 'credentials' or 'documents'
+
+    // Credentials State
     const [credentials, setCredentials] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingCredential, setEditingCredential] = useState(null);
@@ -135,70 +139,91 @@ export default function Dashboard() {
                 </div>
             </header>
 
-            <div className="dashboard-controls">
-                <div className="search-bar">
-                    <Search size={20} className="search-icon" />
-                    <input
-                        type="text"
-                        placeholder="Search credentials..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                </div>
-                <button className="primary-btn add-btn" onClick={() => {
-                    setEditingCredential(null);
-                    setIsModalOpen(true);
-                }}>
-                    <Plus size={20} />
-                    Add Credential
+            <div className="tabs">
+                <button
+                    className={`tab-btn ${activeTab === 'credentials' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('credentials')}
+                >
+                    Credentials
+                </button>
+                <button
+                    className={`tab-btn ${activeTab === 'documents' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('documents')}
+                >
+                    Documents
                 </button>
             </div>
 
-            <div className="credentials-grid">
-                {filteredCredentials.map(cred => (
-                    <div key={cred.id} className="credential-card">
-                        <div className="card-header">
-                            <h3>{cred.platform}</h3>
-                            <div className="card-actions">
-                                <button onClick={() => {
-                                    setEditingCredential(cred);
-                                    setIsModalOpen(true);
-                                }} className="icon-btn">
-                                    <Edit2 size={16} />
-                                </button>
-                                <button onClick={() => initiateDelete(cred.id)} className="icon-btn danger">
-                                    <Trash2 size={16} />
-                                </button>
-                            </div>
+            {activeTab === 'credentials' ? (
+                <>
+                    <div className="dashboard-controls">
+                        <div className="search-bar">
+                            <Search size={20} className="search-icon" />
+                            <input
+                                type="text"
+                                placeholder="Search credentials..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
                         </div>
+                        <button className="primary-btn add-btn" onClick={() => {
+                            setEditingCredential(null);
+                            setIsModalOpen(true);
+                        }}>
+                            <Plus size={20} />
+                            Add Credential
+                        </button>
+                    </div>
 
-                        <div className="card-field">
-                            <label>Username</label>
-                            <div className="field-value">
-                                <span>{cred.username}</span>
-                                <button onClick={() => handleCopy(cred.username)} className="copy-btn">
-                                    <Copy size={14} />
-                                </button>
-                            </div>
-                        </div>
+                    <div className="credentials-grid">
+                        {filteredCredentials.map(cred => (
+                            <div key={cred.id} className="credential-card">
+                                <div className="card-header">
+                                    <h3>{cred.platform}</h3>
+                                    <div className="card-actions">
+                                        <button onClick={() => {
+                                            setEditingCredential(cred);
+                                            setIsModalOpen(true);
+                                        }} className="icon-btn">
+                                            <Edit2 size={16} />
+                                        </button>
+                                        <button onClick={() => initiateDelete(cred.id)} className="icon-btn danger">
+                                            <Trash2 size={16} />
+                                        </button>
+                                    </div>
+                                </div>
 
-                        <div className="card-field">
-                            <label>Password</label>
-                            <div className="field-value">
-                                <span>{viewingPasswordId === cred.id ? cred.password : '••••••••'}</span>
-                                <div className="field-actions">
-                                    <button onClick={() => handleRevealClick(cred.id)} className="copy-btn">
-                                        {viewingPasswordId === cred.id ? <EyeOff size={14} /> : <Eye size={14} />}
-                                    </button>
-                                    <button onClick={() => handleCopy(cred.password)} className="copy-btn">
-                                        <Copy size={14} />
-                                    </button>
+                                <div className="card-field">
+                                    <label>Username</label>
+                                    <div className="field-value">
+                                        <span>{cred.username}</span>
+                                        <button onClick={() => handleCopy(cred.username)} className="copy-btn">
+                                            <Copy size={14} />
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="card-field">
+                                    <label>Password</label>
+                                    <div className="field-value">
+                                        <span>{viewingPasswordId === cred.id ? cred.password : '••••••••'}</span>
+                                        <div className="field-actions">
+                                            <button onClick={() => handleRevealClick(cred.id)} className="copy-btn">
+                                                {viewingPasswordId === cred.id ? <EyeOff size={14} /> : <Eye size={14} />}
+                                            </button>
+                                            <button onClick={() => handleCopy(cred.password)} className="copy-btn">
+                                                <Copy size={14} />
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        ))}
                     </div>
-                ))}
-            </div>
+                </>
+            ) : (
+                <DocumentsView />
+            )}
 
             {isModalOpen && (
                 <CredentialModal

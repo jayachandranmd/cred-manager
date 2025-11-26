@@ -209,6 +209,19 @@ input:focus {
   margin-bottom: 2rem;
 }
 
+@media (max-width: 640px) {
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .user-section {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
 .logo-section {
   display: flex;
   align-items: center;
@@ -415,4 +428,227 @@ input:focus {
   margin-bottom: 0.5rem;
   color: var(--text-secondary);
   font-size: 0.875rem;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  padding: 1rem;
+  font-size: 1rem;
+  position: relative;
+  cursor: pointer;
+}
+
+.tab-btn.active {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.tab-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--accent);
+}
+
+/* File Input */
+.hidden-input {
+  display: none;
+}
+
+.file-input-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  border: 2px dashed var(--border);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all 0.2s;
+  justify-content: center;
+}
+
+.file-input-label:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(56, 189, 248, 0.05);
+}
+
+/* Documents Grid */
+.documents-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.document-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.document-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  border-color: var(--accent);
+}
+
+.doc-icon {
+  margin-bottom: 1rem;
+  background: rgba(56, 189, 248, 0.1);
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.doc-info {
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
+
+.doc-info h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.doc-info p {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.doc-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: auto;
+}
+
+/* Document Viewer */
+.viewer-overlay {
+  z-index: 2000;
+  background: rgba(15, 23, 42, 0.95);
+}
+
+.viewer-container {
+  width: 90vw;
+  height: 90vh;
+  display: flex;
+  flex-direction: column;
+  background: transparent;
+}
+
+.viewer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  color: var(--text-primary);
+}
+
+.viewer-title {
+  margin: 0;
+  font-size: 1.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 50%;
+}
+
+.viewer-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.zoom-controls {
+  display: flex;
+  gap: 0.5rem;
+  background: var(--card-bg);
+  padding: 0.25rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border);
+}
+
+.zoom-controls button {
+  background: transparent;
+  color: var(--text-primary);
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.zoom-controls button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.viewer-content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 1rem;
+}
+
+.image-wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.image-wrapper img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  user-select: none;
+}
+
+.pdf-viewer {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: white;
+}
+
+.unsupported-format {
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.loading-state,
+.error-state {
+  color: var(--text-primary);
 }
