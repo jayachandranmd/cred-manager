@@ -3,8 +3,8 @@ import { useAuth } from '../context/AuthContext';
 import { supabase } from '../supabaseClient';
 import SecondaryPasswordSetup from '../components/SecondaryPasswordSetup';
 import CredentialModal from '../components/CredentialModal';
+import SecurityPinModal from '../components/SecurityPinModal';
 import { Plus, LogOut, Search, Key, Copy, Eye, EyeOff, Edit2, Trash2 } from 'lucide-react';
-import { hashPassword } from '../utils/crypto';
 
 export default function Dashboard() {
     const { signOut, user } = useAuth();
@@ -15,6 +15,10 @@ export default function Dashboard() {
     const [editingCredential, setEditingCredential] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [viewingPasswordId, setViewingPasswordId] = useState(null);
+
+    // Security States
+    const [isRevealAuthenticated, setIsRevealAuthenticated] = useState(false);
+    const [pinModal, setPinModal] = useState({ isOpen: false, type: null, data: null });
 
     useEffect(() => {
         checkProfile();
@@ -57,11 +61,18 @@ export default function Dashboard() {
 
     const handleCopy = (text) => {
         navigator.clipboard.writeText(text);
-        // Could add a toast here
     };
 
-    const handleDelete = async (id) => {
-        if (!confirm('Are you sure you want to delete this credential?')) return;
+    const initiateDelete = (id) => {
+        setPinModal({
+            isOpen: true,
+            type: 'DELETE',
+            data: id
+        });
+    };
+
+    const confirmDelete = async () => {
+        const id = pinModal.data;
         try {
             const { error } = await supabase
                 .from('credentials')
@@ -72,6 +83,28 @@ export default function Dashboard() {
         } catch (error) {
             console.error('Error deleting credential:', error);
         }
+    };
+
+    const handleRevealClick = (id) => {
+        if (viewingPasswordId === id) {
+            setViewingPasswordId(null);
+            return;
+        }
+
+        if (isRevealAuthenticated) {
+            setViewingPasswordId(id);
+        } else {
+            setPinModal({
+                isOpen: true,
+                type: 'REVEAL',
+                data: id
+            });
+        }
+    };
+
+    const confirmReveal = () => {
+        setIsRevealAuthenticated(true);
+        setViewingPasswordId(pinModal.data);
     };
 
     const filteredCredentials = credentials.filter(c =>
@@ -133,7 +166,7 @@ export default function Dashboard() {
                                 }} className="icon-btn">
                                     <Edit2 size={16} />
                                 </button>
-                                <button onClick={() => handleDelete(cred.id)} className="icon-btn danger">
+                                <button onClick={() => initiateDelete(cred.id)} className="icon-btn danger">
                                     <Trash2 size={16} />
                                 </button>
                             </div>
@@ -154,7 +187,7 @@ export default function Dashboard() {
                             <div className="field-value">
                                 <span>{viewingPasswordId === cred.id ? cred.password : '••••••••'}</span>
                                 <div className="field-actions">
-                                    <button onClick={() => setViewingPasswordId(viewingPasswordId === cred.id ? null : cred.id)} className="copy-btn">
+                                    <button onClick={() => handleRevealClick(cred.id)} className="copy-btn">
                                         {viewingPasswordId === cred.id ? <EyeOff size={14} /> : <Eye size={14} />}
                                     </button>
                                     <button onClick={() => handleCopy(cred.password)} className="copy-btn">
@@ -177,6 +210,16 @@ export default function Dashboard() {
                     }}
                 />
             )}
+
+            <SecurityPinModal
+                isOpen={pinModal.isOpen}
+                onClose={() => setPinModal({ ...pinModal, isOpen: false })}
+                onSuccess={pinModal.type === 'DELETE' ? confirmDelete : confirmReveal}
+                title={pinModal.type === 'DELETE' ? "Confirm Deletion" : "Reveal Password"}
+                message={pinModal.type === 'DELETE'
+                    ? "Enter your PIN to delete this credential. This action cannot be undone."
+                    : "Enter your PIN to reveal passwords. You won't be asked again this session."}
+            />
         </div>
     );
 }
