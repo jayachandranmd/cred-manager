@@ -363,6 +363,13 @@ input:focus {
   font-size: 0.9rem;
 }
 
+.field-value span {
+  word-break: break-all;
+  white-space: normal;
+  margin-right: 0.5rem;
+  flex: 1;
+}
+
 .field-actions {
   display: flex;
   gap: 0.5rem;
